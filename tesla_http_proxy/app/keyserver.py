@@ -37,4 +37,4 @@ def public_key():
 if __name__ == "__main__":
     logger.info("*** Starting Flask keyserver... ***")
     cli.show_server_banner = lambda *_: None
-    app.run(port=8099, debug=False, host="0.0.0.0")
+    app.run(port=8098, debug=False, host="0.0.0.0")
