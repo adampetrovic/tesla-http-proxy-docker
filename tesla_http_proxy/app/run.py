@@ -4,7 +4,7 @@ import uuid
 import logging
 import argparse
 import requests
-from flask import Flask, request, render_template, cli, redirect
+from flask import Flask, request, render_template, cli, redirect, send_from_directory
 from werkzeug.exceptions import HTTPException
 
 logging.basicConfig(
@@ -22,8 +22,6 @@ AUDIENCES = {
     "Europe, Middle East, Africa": "https://fleet-api.prd.eu.vn.cloud.tesla.com",
     "China": "https://fleet-api.prd.cn.vn.cloud.tesla.cn",
 }
-BLUE = "\u001b[34m"
-RESET = "\x1b[0m"
 
 parser = argparse.ArgumentParser()
 
@@ -49,9 +47,9 @@ parser.add_argument(
     default=os.environ.get("REGION"),
 )
 parser.add_argument(
-    "--proxy-host",
-    help="Proxy host. Required if not provided in environment variable PROXY_HOST",
-    default=os.environ.get("PROXY_HOST"),
+    "--config-base",
+    help="Config base path. Required if not provided in environment variable CONFIG_BASE",
+    default=os.environ.get("CONFIG_BASE"),
 )
 
 args = parser.parse_args()
@@ -61,7 +59,7 @@ if (
     or not args.client_secret
     or not args.domain
     or not args.region
-    or not args.proxy_host
+    or not args.config_base
 ):
     parser.print_help()
     sys.exit(1)
@@ -95,7 +93,6 @@ def index():
 @app.route("/callback")
 def callback():
     """Handle POST callback from Tesla server to complete OAuth"""
-
     logger.info("callback args: %s", request.args)
     # sometimes I don't get a valid code, not sure why
     try:
@@ -121,27 +118,16 @@ def callback():
 
     output = (
         "Info to enter into Tesla Custom component:\n"
-        f"Refresh token  : {BLUE}{req.json()['refresh_token']}{RESET}\n"
-        f"Proxy URL      : {BLUE}https://{args.proxy_host}:4430{RESET}\n"
-        f"SSL certificate: {BLUE}/share/home-assistant/selfsigned.pem{RESET}\n"
-        f"Client ID      : {BLUE}{args.client_id}{RESET}\n"
+        f"Refresh token  : {req.json()['refresh_token']}\n"
+        f"Proxy URL      : https://{args.domain}\n"
+        f"SSL certificate: {args.config_base}/tesla-proxy/cert.pem\n"
+        f"Client ID      : {args.client_id}\n"
     )
 
     logger.info(output)
 
     req.raise_for_status()
-    with open("/data/refresh_token", "w", encoding="utf-8") as f:
-        f.write(req.json()["refresh_token"])
-    with open("/data/access_token", "w", encoding="utf-8") as f:
-        f.write(req.json()["access_token"])
-
     return render_template("callback.html")
-
-
-@app.route("/shutdown")
-def shutdown():
-    """Shutdown Flask server so the HTTP proxy can start"""
-    os._exit(0)
 
 
 @app.route("/register-partner-account")

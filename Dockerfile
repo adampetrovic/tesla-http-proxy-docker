@@ -17,13 +17,10 @@ FROM alpine:3.19.1
 RUN apk add --no-cache \
   python3 \
   py3-flask \
-  py3-requests \
-  gpg-agent \
-  pass \
-  openssl
+  py3-requests
 
 # Create various working directories
-RUN mkdir /data /share
+RUN mkdir /config
 
 # Copy project files into required locations
 COPY tesla_http_proxy/app /app
@@ -32,10 +29,7 @@ COPY tesla_http_proxy/app /app
 COPY --from=build /app/bin/tesla-http-proxy /app/bin/tesla-keygen /usr/bin/
 
 # Set environment variables
-ENV GNUPGHOME="/data/gnugpg"
-ENV PASSWORD_STORE_DIR="/data/password-store"
+ENV CONFIG_BASE="/config"
 
-# Python 3 HTTP Server serves the current working dir
 WORKDIR /app
-
 ENTRYPOINT ["/app/run.sh"]
