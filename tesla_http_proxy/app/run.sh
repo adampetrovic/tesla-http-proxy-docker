@@ -19,5 +19,5 @@ elif [ $SERVER_MODE == 2 ]; then
   python3 /app/run.py --client-id "$CLIENT_ID" --client-secret "$CLIENT_SECRET" --domain "$DOMAIN" --region "$REGION" --proxy-host "$DOMAIN" --config-base "$CONFIG_BASE"
 elif [ $SERVER_MODE == 3 ]; then
   echo "Starting Tesla HTTP Proxy"
-  tesla-http-proxy -cert $CONFIG_BASE/tls/cert.pem -tls-key $CONFIG_BASE/tls/key.pem -port 8099 -host 0.0.0.0 -verbose
+  tesla-http-proxy -key-file $CONFIG_BASE/tesla/com.tesla.3p.private-key.pem -cert $CONFIG_BASE/tls/cert.pem -tls-key $CONFIG_BASE/tls/key.pem -port 8099 -host 0.0.0.0 -verbose
 fi
