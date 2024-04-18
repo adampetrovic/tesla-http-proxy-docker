@@ -177,4 +177,4 @@ def register_partner_account():
 if __name__ == "__main__":
     logger.info("*** Starting Flask setup server... ***")
     cli.show_server_banner = lambda *_: None
-    app.run(port=8099, debug=False, host="0.0.0.0")
+    app.run(port=8097, debug=False, host="0.0.0.0")
