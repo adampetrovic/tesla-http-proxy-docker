@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: tesla-http-proxy
+  IMAGE_NAME: adampetrovic/tesla-http-proxy
 
 jobs:
   build:
